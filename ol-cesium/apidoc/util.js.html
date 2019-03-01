@@ -1,0 +1,195 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="utf-8">
+    <title>JSDoc: Source: util.js</title>
+
+    <script src="scripts/prettify/prettify.js"> </script>
+    <script src="scripts/prettify/lang-css.js"> </script>
+    <!--[if lt IE 9]>
+      <script src="//html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    <![endif]-->
+    <link type="text/css" rel="stylesheet" href="styles/prettify-tomorrow.css">
+    <link type="text/css" rel="stylesheet" href="styles/jsdoc-default.css">
+</head>
+
+<body>
+
+<div id="main">
+
+    <h1 class="page-title">Source: util.js</h1>
+
+    
+
+
+
+    
+    <section>
+        <article>
+            <pre class="prettyprint source linenums"><code>/**
+ * @module olcs.util
+ */
+const exports = {};
+
+
+/**
+ * Cast to object.
+ * @param {Object} param
+ * @return {Object}
+ */
+exports.obj = function(param) {
+  return param;
+};
+
+
+/**
+ * @type {boolean|undefined}
+ * @private
+ */
+exports.supportsImageRenderingPixelatedResult_ = undefined;
+
+
+/**
+ * @type {string|undefined}
+ * @private
+ */
+exports.imageRenderingValueResult_ = undefined;
+
+
+/**
+ * @return {boolean}
+ */
+exports.supportsImageRenderingPixelated = function() {
+  if (exports.supportsImageRenderingPixelatedResult_ === undefined) {
+    const canvas = document.createElement('canvas');
+    canvas.setAttribute('style', 'image-rendering: -moz-crisp-edges; image-rendering: pixelated;');
+    // canvas.style.imageRendering will be undefined, null or an
+    // empty string on unsupported browsers.
+    const tmp = canvas.style['imageRendering']; // non standard
+    exports.supportsImageRenderingPixelatedResult_ = !!tmp;
+    if (exports.supportsImageRenderingPixelatedResult_) {
+      exports.imageRenderingValueResult_ = tmp;
+    }
+  }
+  return exports.supportsImageRenderingPixelatedResult_;
+};
+
+
+/**
+ * @return {string}
+ */
+exports.imageRenderingValue = function() {
+  exports.supportsImageRenderingPixelated();
+  return exports.imageRenderingValueResult_ || '';
+};
+
+/**
+ * Return the projection of the source that Cesium should use.
+ *
+ * @param {ol.source.Source} source Source.
+ * @returns {ol.proj.Projection} The projection of the source.
+ */
+exports.getSourceProjection = function(source) {
+  return /** @type {ol.proj.Projection} */ (source.get('olcs.projection'))
+    || source.getProjection();
+};
+
+/**
+ * @param {ol.Observable} observable
+ * @param {string} type
+ * @param {Function} listener
+ * @return {!ol.events.EventsKey}
+ */
+export function olcsListen(observable, type, listener) {
+  // See https://github.com/openlayers/openlayers/pull/8481
+  // ol.events.listen is internal so we use `on` instead.
+  // And since `on` as a convoluted API (can return an EventsKey or an array of them)
+  // we use a cast here.
+  return /** @type {!ol.events.EventsKey} */ (observable.on(type, listener));
+}
+
+/**
+ * Counter for getUid.
+ * @type {number}
+ */
+let uidCounter_ = 0;
+
+/**
+ * Gets a unique ID for an object. This mutates the object so that further calls
+ * with the same object as a parameter returns the same value. Unique IDs are generated
+ * as a strictly increasing sequence. Adapted from goog.getUid.
+ *
+ * @param {Object} obj The object to get the unique ID for.
+ * @return {number} The unique ID for the object.
+ */
+export function getUid(obj) {
+  return obj.olcs_uid || (obj.olcs_uid = ++uidCounter_);
+}
+
+/**
+ * Sort the passed array such that the relative order of equal elements is preverved.
+ * See https://en.wikipedia.org/wiki/Sorting_algorithm#Stability for details.
+ * @param {Array&lt;*>} arr The array to sort (modifies original).
+ * @param {!function(*, *): number} compareFnc Comparison function.
+ */
+export function stableSort(arr, compareFnc) {
+  const length = arr.length;
+  const tmp = Array(arr.length);
+  for (let i = 0; i &lt; length; i++) {
+    tmp[i] = {index: i, value: arr[i]};
+  }
+  tmp.sort((a, b) => compareFnc(a.value, b.value) || a.index - b.index);
+  for (let i = 0; i &lt; arr.length; i++) {
+    arr[i] = tmp[i].value;
+  }
+}
+
+/**
+ * @param {Node} node The node to remove.
+ * @returns {Node} The node that was removed or null.
+ */
+export function removeNode(node) {
+  return node &amp;&amp; node.parentNode ? node.parentNode.removeChild(node) : null;
+}
+
+/**
+ * @param {Node} node The node to remove the children from.
+ */
+export function removeChildren(node) {
+  while (node.lastChild) {
+    node.removeChild(node.lastChild);
+  }
+}
+
+/**
+ * @param {Cesium.Scene} scene The scene.
+ */
+export function isGroundPolylinePrimitiveSupported(scene) {
+  const obj = Cesium.GroundPolylinePrimitive;
+  return obj &amp;&amp; obj.isSupported(scene);
+}
+
+export default exports;
+</code></pre>
+        </article>
+    </section>
+
+
+
+
+</div>
+
+<nav>
+    <h2><a href="index.html">Home</a></h2><h3>Modules</h3><ul><li><a href="olcs.module_AbstractSynchronizer.html">AbstractSynchronizer</a></li><li><a href="olcs.module_AutoRenderLoop.html">AutoRenderLoop</a></li><li><a href="olcs.module_Camera.html">Camera</a></li><li><a href="olcs.module_core.html">core</a></li><li><a href="olcs.module_FeatureConverter.html">FeatureConverter</a></li><li><a href="olcs.module_OLCesium.html">OLCesium</a></li><li><a href="olcs.module_OverlaySynchronizer.html">OverlaySynchronizer</a></li><li><a href="olcs.module_RasterSynchronizer.html">RasterSynchronizer</a></li><li><a href="olcs.module_SynchronizedOverlay.html">SynchronizedOverlay</a></li><li><a href="olcs.module_util.html">util</a></li><li><a href="olcs.module_VectorSynchronizer.html">VectorSynchronizer</a></li></ul><h3>Classes</h3><ul><li><a href="olcs.module_AbstractSynchronizer-AbstractSynchronizer.html">AbstractSynchronizer</a></li><li><a href="olcs.module_AutoRenderLoop-AutoRenderLoop.html">AutoRenderLoop</a></li><li><a href="olcs.module_Camera-Camera.html">Camera</a></li><li><a href="olcs.module_FeatureConverter-FeatureConverter.html">FeatureConverter</a></li><li><a href="olcs.module_OLCesium-OLCesium.html">OLCesium</a></li><li><a href="olcs.module_OverlaySynchronizer-OverlaySynchronizer.html">OverlaySynchronizer</a></li><li><a href="olcs.module_RasterSynchronizer-RasterSynchronizer.html">RasterSynchronizer</a></li><li><a href="olcs.module_SynchronizedOverlay-SynchronizedOverlay.html">SynchronizedOverlay</a></li><li><a href="olcs.module_VectorSynchronizer-VectorSynchronizer.html">VectorSynchronizer</a></li></ul><h3>Namespaces</h3><ul><li><a href="olcs.core.html">core</a></li></ul><h3>Global</h3><ul><li><a href="global.html#toDegrees">toDegrees</a></li><li><a href="global.html#toRadians">toRadians</a></li></ul>
+</nav>
+
+<br class="clear">
+
+<footer>
+    Documentation generated by <a href="https://github.com/jsdoc3/jsdoc">JSDoc 3.5.5</a> on Thu Dec 06 2018 14:44:03 GMT+0100 (CET)
+</footer>
+
+<script> prettyPrint(); </script>
+<script src="scripts/linenumber.js"> </script>
+</body>
+</html>
